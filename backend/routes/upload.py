@@ -14,22 +14,29 @@ async def upload_audio(file: UploadFile = File(...)):
     """
     Accept an uploaded audio file and store it in the uploads directory.
 
-    This is a placeholder implementation. The final version should:
-    - Validate file type and size
-    - Persist metadata (e.g., in a database)
-    - Return a stable file_id for later processing
+    Returns a JSON payload describing the stored file so the frontend
+    can reference it for further processing.
     """
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
 
     file_id = str(uuid.uuid4())
-    upload_path = Path(UPLOADS_DIR) / f"{file_id}_{file.filename}"
+    stored_filename = f"{file_id}_{file.filename}"
+    upload_path = Path(UPLOADS_DIR) / stored_filename
 
-    # Placeholder: naive save without validation
+    # Naive save without validation
+    contents = await file.read()
+    size_bytes = len(contents)
     with upload_path.open("wb") as buffer:
-        buffer.write(await file.read())
+        buffer.write(contents)
 
-    # TODO: Persist file metadata and mapping from file_id to file path
+    payload = {
+        "file_id": file_id,
+        "original_filename": file.filename,
+        "stored_filename": stored_filename,
+        "size_bytes": size_bytes,
+        "content_type": file.content_type or "application/octet-stream",
+    }
 
-    return JSONResponse({"file_id": file_id, "filename": file.filename})
+    return JSONResponse(payload)
 

@@ -21,6 +21,10 @@ def create_app() -> FastAPI:
     app.include_router(upload.router, prefix="/api")
     app.include_router(split.router, prefix="/api")
 
+    @app.get("/")
+    async def health() -> dict:
+        return {"status": "ok"}
+
     return app
 
 

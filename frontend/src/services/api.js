@@ -1,11 +1,24 @@
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = "/api";
 
 async function handleJsonResponse(response) {
-  if (!response.ok) {
-    // Placeholder error handling
-    throw new Error(`API error: ${response.status}`);
+  let data = null;
+  try {
+    data = await response.json();
+  } catch (e) {
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+    return null;
   }
-  return response.json();
+
+  if (!response.ok) {
+    const message =
+      (data && (data.detail || data.message)) ||
+      `Request failed with status ${response.status}`;
+    throw new Error(message);
+  }
+
+  return data;
 }
 
 export async function uploadAudio(file) {
@@ -17,31 +30,48 @@ export async function uploadAudio(file) {
     body: formData
   });
 
-  // In the real implementation, the backend will return a fully
-  // defined schema. For now, we just parse JSON.
   return handleJsonResponse(response);
 }
 
-export async function requestSplit(fileId) {
+export async function splitTrack(fileId) {
   const response = await fetch(`${API_BASE}/split/${fileId}`, {
     method: "POST"
   });
   return handleJsonResponse(response);
 }
 
-export async function fetchStems(fileId) {
+export async function listStems(fileId) {
   const response = await fetch(`${API_BASE}/stems/${fileId}`);
   return handleJsonResponse(response);
 }
 
 export async function downloadStem(fileId, stemName) {
-  // Placeholder: trigger backend download endpoint.
-  // The final implementation should:
-  // - Use fetch with "blob" responseType
-  // - Create an object URL and simulate a click for download
-  const url = new URL(`${API_BASE}/download/${fileId}`);
-  url.searchParams.set("stem_name", stemName);
+  const url = new URL(`${API_BASE}/download/${fileId}`, window.location.origin);
+  url.searchParams.set("stem", stemName);
 
-  await fetch(url.toString());
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    let message = `Download failed with status ${response.status}`;
+    try {
+      const data = await response.json();
+      if (data && data.detail) {
+        message = data.detail;
+      }
+    } catch (e) {
+      // ignore JSON parse errors for non-JSON responses
+    }
+    throw new Error(message);
+  }
+
+  const blob = await response.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.download = `${stemName}.wav`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(downloadUrl);
 }
+
 

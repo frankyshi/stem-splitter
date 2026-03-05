@@ -1,5 +1,5 @@
-function ProcessingStatus({ isProcessing, fileId }) {
-  if (!fileId && !isProcessing) {
+function ProcessingStatus({ isProcessing, fileId, statusMessage }) {
+  if (!fileId && !isProcessing && !statusMessage) {
     return null;
   }
 
@@ -17,17 +17,20 @@ function ProcessingStatus({ isProcessing, fileId }) {
         Processing status
       </h2>
 
-      {isProcessing ? (
-        <p style={{ color: "#22c55e", fontSize: "0.95rem" }}>
-          Splitting your track into stems… (placeholder status)
-        </p>
-      ) : (
-        <p style={{ color: "#9ca3af", fontSize: "0.95rem" }}>
-          {fileId
-            ? "Processing complete. Stems are ready to preview or download."
-            : "Waiting for an upload."}
-        </p>
-      )}
+      <p
+        style={{
+          color: isProcessing ? "#22c55e" : "#9ca3af",
+          fontSize: "0.95rem"
+        }}
+      >
+        {statusMessage
+          ? statusMessage
+          : isProcessing
+          ? "Processing your track…"
+          : fileId
+          ? "Processing complete. Stems are ready to preview or download."
+          : "Waiting for an upload."}
+      </p>
 
       {fileId && (
         <p

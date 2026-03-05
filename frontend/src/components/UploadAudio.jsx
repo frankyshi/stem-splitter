@@ -1,7 +1,13 @@
 import { useState } from "react";
-import { uploadAudio, requestSplit } from "../services/api.js";
+import { uploadAudio, splitTrack } from "../services/api.js";
 
-function UploadAudio({ fileId, setFileId, setIsProcessing, setStems }) {
+function UploadAudio({
+  fileId,
+  setFileId,
+  setIsProcessing,
+  setStems,
+  setStatusMessage
+}) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
 
@@ -16,20 +22,33 @@ function UploadAudio({ fileId, setFileId, setIsProcessing, setStems }) {
       return;
     }
 
-    // Placeholder flow: call the backend upload + split endpoints
     try {
       setIsProcessing(true);
       setError(null);
+      if (setStatusMessage) {
+        setStatusMessage("Uploading audio file…");
+      }
 
       const uploadResult = await uploadAudio(selectedFile);
       const newFileId = uploadResult.file_id;
       setFileId(newFileId);
 
-      // Trigger splitting (placeholder, no real progress tracking yet)
-      const splitResult = await requestSplit(newFileId);
+      if (setStatusMessage) {
+        setStatusMessage("Splitting track into stems…");
+      }
+
+      const splitResult = await splitTrack(newFileId);
       setStems(splitResult.stems ?? []);
+
+      if (setStatusMessage) {
+        setStatusMessage("Processing complete. Stems are ready.");
+      }
     } catch (e) {
-      setError("Upload or processing failed (placeholder).");
+      const message = e?.message || "Upload or processing failed.";
+      setError(message);
+      if (setStatusMessage) {
+        setStatusMessage(message);
+      }
     } finally {
       setIsProcessing(false);
     }

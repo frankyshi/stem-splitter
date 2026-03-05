@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 from typing import List, Dict
-import shutil
 
 from ..paths import STEMS_DIR, UPLOADS_DIR
+from ..services.demucs_service import split_to_stems
 
 
 router = APIRouter(tags=["stems"])
@@ -12,31 +12,11 @@ router = APIRouter(tags=["stems"])
 SUPPORTED_STEMS = ("vocals", "drums", "bass", "other")
 
 
-def _build_stem_metadata(file_id: str) -> List[Dict[str, str]]:
-    """
-    Helper to build the normalized stem metadata structure.
-    """
-    stems: List[Dict[str, str]] = []
-    for stem_name in SUPPORTED_STEMS:
-        stems.append(
-            {
-                "name": stem_name,
-                "filename": f"{stem_name}.wav",
-                "url": f"/api/download/{file_id}?stem={stem_name}",
-            }
-        )
-    return stems
-
-
 @router.post("/split/{file_id}")
 async def split_track(file_id: str):
     """
-    Trigger stem separation for a previously uploaded audio file.
-
-    Stub implementation (no Demucs yet):
-    - Finds the uploaded file by file_id prefix.
-    - Creates STEMS_DIR/<file_id>/.
-    - Copies the original audio into 4 placeholder stem files.
+    Trigger stem separation for a previously uploaded audio file
+    using the Demucs model.
     """
     uploads_root = Path(UPLOADS_DIR)
     if not uploads_root.exists():
@@ -53,16 +33,22 @@ async def split_track(file_id: str):
 
     source_path = matches[0]
     output_dir = Path(STEMS_DIR) / file_id
-    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Create placeholder stems by copying the original file
-    for stem_name in SUPPORTED_STEMS:
-        target_path = output_dir / f"{stem_name}.wav"
-        shutil.copyfile(source_path, target_path)
+    # Perform real separation via Demucs
+    stem_entries = split_to_stems(source_path, output_dir)
 
-    stems = _build_stem_metadata(file_id)
+    # Preserve the existing response contract by attaching URLs here.
+    stems_with_urls: List[Dict[str, str]] = []
+    for stem in stem_entries:
+        name = stem.get("name")
+        stems_with_urls.append(
+            {
+                **stem,
+                "url": f"/api/download/{file_id}?stem={name}",
+            }
+        )
 
-    return JSONResponse({"file_id": file_id, "status": "done", "stems": stems})
+    return JSONResponse({"file_id": file_id, "status": "done", "stems": stems_with_urls})
 
 
 @router.get("/stems/{file_id}")

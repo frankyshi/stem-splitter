@@ -7,6 +7,7 @@ function Home() {
   const [fileId, setFileId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [stems, setStems] = useState([]);
+  const [statusMessage, setStatusMessage] = useState("");
 
   return (
     <main
@@ -39,9 +40,14 @@ function Home() {
           setFileId={setFileId}
           setIsProcessing={setIsProcessing}
           setStems={setStems}
+          setStatusMessage={setStatusMessage}
         />
 
-        <ProcessingStatus isProcessing={isProcessing} fileId={fileId} />
+        <ProcessingStatus
+          isProcessing={isProcessing}
+          fileId={fileId}
+          statusMessage={statusMessage}
+        />
 
         <StemPlayer fileId={fileId} stems={stems} />
       </section>

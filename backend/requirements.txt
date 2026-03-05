@@ -2,10 +2,5 @@ fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 python-multipart>=0.0.7
 pydantic>=2.9.0
-
-# Audio processing and Demucs-related dependencies will be added
-# when implementing the actual stem separation logic.
-# Example (to be confirmed and pinned later):
-# demucs
-# torch
+demucs
 

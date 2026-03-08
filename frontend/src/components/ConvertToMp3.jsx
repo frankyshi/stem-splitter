@@ -25,6 +25,12 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
     try {
       if (setStatusMessage) setStatusMessage("Converting to mp3…");
       const result = await importYouTubeAudio(url);
+      if (!result || result.file_id == null) {
+        setError("Invalid response from server.");
+        setStatus("error");
+        if (setStatusMessage) setStatusMessage("Invalid response from server.");
+        return;
+      }
       const fileId = result.file_id;
       const filename = result.stored_filename || result.original_filename || "audio.mp3";
 

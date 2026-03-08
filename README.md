@@ -43,7 +43,7 @@ pip install -r requirements.txt
 ### Run the backend
 
 ```bash
-cd . # Go back to the stem-splitter directory
+cd .. # Go back to the stem-splitter directory
 uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 

@@ -5,10 +5,10 @@ async function handleJsonResponse(response) {
   try {
     data = await response.json();
   } catch (e) {
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
-    }
-    return null;
+    const msg = response.ok
+      ? "Invalid response from server."
+      : `Request failed with status ${response.status}`;
+    throw new Error(msg);
   }
 
   if (!response.ok) {

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 import uuid
 
@@ -7,6 +7,29 @@ from ..paths import UPLOADS_DIR
 
 
 router = APIRouter(tags=["upload"])
+
+
+@router.get("/download-original/{file_id}")
+async def download_original(file_id: str):
+    """
+    Serve the original uploaded/imported audio file (e.g. mp3) for preview and download.
+    """
+    uploads_root = Path(UPLOADS_DIR)
+    if not uploads_root.exists():
+        raise HTTPException(status_code=404, detail="Uploads directory not found")
+    matches = [
+        p
+        for p in uploads_root.iterdir()
+        if p.is_file() and p.name.startswith(f"{file_id}_")
+    ]
+    if not matches:
+        raise HTTPException(status_code=404, detail="File not found")
+    path = matches[0]
+    return FileResponse(
+        path,
+        media_type="audio/mpeg",
+        filename=path.name,
+    )
 
 
 @router.post("/upload")

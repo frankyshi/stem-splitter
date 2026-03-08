@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { importYouTubeAudio, splitTrack } from "../services/api.js";
+import { importYouTubeAudio } from "../services/api.js";
 
 /**
  * Section: "Convert xxx to mp3".
- * V1: YouTube URL → mp3 → split to stems. Flow: importYouTubeAudio(url) → file_id → splitTrack(file_id) → stems.
+ * Flow: importYouTubeAudio(url) → file_id + audio_url → show preview/download → user clicks "Split to stems" below.
  */
-function ConvertToMp3({ setFileId, setStems, setStatusMessage, setIsProcessing }) {
+function ConvertToMp3({ setFileId, setStatusMessage }) {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [error, setError] = useState(null);
   const [importedFilename, setImportedFilename] = useState(null);
+  const [importedAudioUrl, setImportedAudioUrl] = useState(null);
 
   const handleYouTubeImport = async () => {
     const url = youtubeUrl.trim();
@@ -20,8 +21,8 @@ function ConvertToMp3({ setFileId, setStems, setStatusMessage, setIsProcessing }
 
     setStatus("loading");
     setError(null);
+    setImportedAudioUrl(null);
     if (typeof setStatusMessage === "function") setStatusMessage("Downloading audio…");
-    if (typeof setIsProcessing === "function") setIsProcessing(true);
 
     try {
       if (typeof setStatusMessage === "function") setStatusMessage("Converting to mp3…");
@@ -34,25 +35,20 @@ function ConvertToMp3({ setFileId, setStems, setStatusMessage, setIsProcessing }
       }
       const fileId = result.file_id;
       const filename = (result.stored_filename || result.original_filename) || "audio.mp3";
+      const audioUrl = result.audio_url || result.download_url || `/api/download-original/${fileId}`;
+      const fullAudioUrl = audioUrl.startsWith("http") ? audioUrl : `${window.location.origin}${audioUrl}`;
 
       if (typeof setFileId === "function") setFileId(fileId);
       setImportedFilename(filename);
-      if (typeof setStatusMessage === "function") setStatusMessage("Splitting stems…");
-
-      const splitResult = await splitTrack(fileId);
-      const stemList = Array.isArray(splitResult && splitResult.stems) ? splitResult.stems : [];
-      if (typeof setStems === "function") setStems(stemList);
-
+      setImportedAudioUrl(fullAudioUrl);
       setStatus("success");
-      if (typeof setStatusMessage === "function") setStatusMessage("Processing complete. Stems are ready.");
+      if (typeof setStatusMessage === "function") setStatusMessage("Ready for stem splitting.");
     } catch (e) {
-      console.error("[ConvertToMp3] import/split failed:", e);
+      console.error("[ConvertToMp3] import failed:", e);
       const message = (e && e.message) || "Import failed.";
       setError(message);
       setStatus("error");
       if (typeof setStatusMessage === "function") setStatusMessage(message);
-    } finally {
-      if (typeof setIsProcessing === "function") setIsProcessing(false);
     }
   };
 
@@ -133,10 +129,34 @@ function ConvertToMp3({ setFileId, setStems, setStatusMessage, setIsProcessing }
         </p>
       )}
 
-      {status === "success" && importedFilename && (
-        <p style={{ color: "#9ca3af", marginTop: "0.75rem", fontSize: "0.9rem" }}>
-          Ready. Stems are shown below.
-        </p>
+      {status === "success" && importedAudioUrl && (
+        <div style={{ marginTop: "1rem" }}>
+          <p style={{ color: "#9ca3af", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
+            Ready to split. Use the section below to split into stems.
+          </p>
+          <audio
+            controls
+            src={importedAudioUrl}
+            style={{ width: "100%", marginBottom: "0.75rem" }}
+          />
+          <a
+            href={importedAudioUrl}
+            download={importedFilename || "audio.mp3"}
+            style={{
+              display: "inline-block",
+              padding: "0.5rem 1rem",
+              borderRadius: "999px",
+              border: "1px solid rgba(148, 163, 184, 0.7)",
+              backgroundColor: "transparent",
+              color: "#e5e7eb",
+              textDecoration: "none",
+              fontSize: "0.9rem",
+              cursor: "pointer"
+            }}
+          >
+            Download mp3
+          </a>
+        </div>
       )}
     </section>
   );

@@ -46,7 +46,14 @@ export async function splitTrack(fileId) {
   const response = await fetch(`${API_BASE}/split/${fileId}`, {
     method: "POST"
   });
-  return handleJsonResponse(response);
+  const data = await handleJsonResponse(response);
+  if (!data || typeof data !== "object") {
+    throw new Error("Invalid response from server.");
+  }
+  return {
+    ...data,
+    stems: Array.isArray(data.stems) ? data.stems : []
+  };
 }
 
 export async function listStems(fileId) {

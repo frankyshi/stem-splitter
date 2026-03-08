@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { importYouTubeAudio } from "../services/api.js";
+import { importYouTubeAudio, splitTrack } from "../services/api.js";
 
 /**
  * Section: "Convert xxx to mp3".
- * V1: YouTube URL → mp3. Structured so we can add more sources (e.g. mp4→mp3) later.
+ * V1: YouTube URL → mp3 → split to stems. Flow: importYouTubeAudio(url) → file_id → splitTrack(file_id) → stems.
  */
-function ConvertToMp3({ setFileId, setStatusMessage }) {
+function ConvertToMp3({ setFileId, setStems, setStatusMessage, setIsProcessing }) {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [error, setError] = useState(null);
@@ -21,6 +21,7 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
     setStatus("loading");
     setError(null);
     if (setStatusMessage) setStatusMessage("Downloading audio…");
+    if (setIsProcessing) setIsProcessing(true);
 
     try {
       if (setStatusMessage) setStatusMessage("Converting to mp3…");
@@ -36,13 +37,21 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
 
       setFileId(fileId);
       setImportedFilename(filename);
+      if (setStatusMessage) setStatusMessage("Splitting stems…");
+
+      const splitResult = await splitTrack(fileId);
+      const stemList = Array.isArray(splitResult?.stems) ? splitResult.stems : [];
+      if (setStems) setStems(stemList);
+
       setStatus("success");
-      if (setStatusMessage) setStatusMessage("Ready for stem splitting.");
+      if (setStatusMessage) setStatusMessage("Processing complete. Stems are ready.");
     } catch (e) {
       const message = e?.message || "Import failed.";
       setError(message);
       setStatus("error");
       if (setStatusMessage) setStatusMessage(message);
+    } finally {
+      if (setIsProcessing) setIsProcessing(false);
     }
   };
 
@@ -125,7 +134,7 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
 
       {status === "success" && importedFilename && (
         <p style={{ color: "#9ca3af", marginTop: "0.75rem", fontSize: "0.9rem" }}>
-          Ready for stem splitting. Use &quot;Split to stems&quot; below.
+          Ready. Stems are shown below.
         </p>
       )}
     </section>

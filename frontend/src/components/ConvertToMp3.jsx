@@ -11,6 +11,7 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
   const [error, setError] = useState(null);
   const [importedFilename, setImportedFilename] = useState(null);
   const [importedAudioUrl, setImportedAudioUrl] = useState(null);
+  const [importedFileId, setImportedFileId] = useState(null);
 
   const handleYouTubeImport = async () => {
     const url = youtubeUrl.trim();
@@ -22,11 +23,14 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
     setStatus("loading");
     setError(null);
     setImportedAudioUrl(null);
+    setImportedFileId(null);
     if (typeof setStatusMessage === "function") setStatusMessage("Downloading audio…");
 
     try {
       if (typeof setStatusMessage === "function") setStatusMessage("Converting to mp3…");
       const result = await importYouTubeAudio(url);
+      console.log("[ConvertToMp3] import response:", result);
+
       if (!result || result.file_id == null) {
         setError("Invalid response from server.");
         setStatus("error");
@@ -34,11 +38,13 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
         return;
       }
       const fileId = result.file_id;
-      const filename = (result.stored_filename || result.original_filename) || "audio.mp3";
+      const filename = (result.filename || result.stored_filename || result.original_filename) || "audio.mp3";
       const audioUrl = result.audio_url || result.download_url || `/api/download-original/${fileId}`;
-      const fullAudioUrl = audioUrl.startsWith("http") ? audioUrl : `${window.location.origin}${audioUrl}`;
+      const fullAudioUrl = (audioUrl && audioUrl.startsWith("http")) ? audioUrl : `${window.location.origin}${audioUrl}`;
+      console.log("[ConvertToMp3] fileId=%s fullAudioUrl=%s setting success", fileId, fullAudioUrl);
 
       if (typeof setFileId === "function") setFileId(fileId);
+      setImportedFileId(fileId);
       setImportedFilename(filename);
       setImportedAudioUrl(fullAudioUrl);
       setStatus("success");
@@ -119,7 +125,7 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
 
       {status === "loading" && (
         <p style={{ color: "#22c55e", marginTop: "0.75rem", fontSize: "0.9rem" }}>
-          Downloading audio… Converting to mp3…
+          Downloading audio… Converting to mp3… (this may take a minute)
         </p>
       )}
 
@@ -129,18 +135,18 @@ function ConvertToMp3({ setFileId, setStatusMessage }) {
         </p>
       )}
 
-      {status === "success" && importedAudioUrl && (
+      {status === "success" && (importedAudioUrl || importedFileId) && (
         <div style={{ marginTop: "1rem" }}>
           <p style={{ color: "#9ca3af", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
             Ready to split. Use the section below to split into stems.
           </p>
           <audio
             controls
-            src={importedAudioUrl}
+            src={importedAudioUrl || (importedFileId ? `${window.location.origin}/api/download-original/${importedFileId}` : undefined)}
             style={{ width: "100%", marginBottom: "0.75rem" }}
           />
           <a
-            href={importedAudioUrl}
+            href={importedAudioUrl || (importedFileId ? `${window.location.origin}/api/download-original/${importedFileId}` : "#")}
             download={importedFilename || "audio.mp3"}
             style={{
               display: "inline-block",

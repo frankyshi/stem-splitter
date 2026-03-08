@@ -5,6 +5,7 @@ async function handleJsonResponse(response) {
   try {
     data = await response.json();
   } catch (e) {
+    console.error("[api] handleJsonResponse:", e);
     const msg = response.ok
       ? "Invalid response from server."
       : `Request failed with status ${response.status}`;

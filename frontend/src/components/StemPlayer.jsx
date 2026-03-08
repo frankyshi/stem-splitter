@@ -2,12 +2,12 @@ import { downloadStem } from "../services/api.js";
 
 function StemPlayer({ fileId, stems }) {
   const safeStems = Array.isArray(stems) ? stems : [];
-  if (!fileId || safeStems.length === 0) {
+  if (fileId == null || fileId === "" || safeStems.length === 0) {
     return null;
   }
 
   const handleDownload = async (stem) => {
-    if (stem?.name) await downloadStem(fileId, stem.name);
+    if (stem && stem.name) await downloadStem(fileId, stem.name);
   };
 
   return (
@@ -29,10 +29,10 @@ function StemPlayer({ fileId, stems }) {
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {safeStems.map((stem, index) => {
           if (!stem) return null;
-          const name = stem.name ?? `stem-${index}`;
+          const name = (stem.name != null && stem.name !== "") ? stem.name : `stem-${index}`;
           return (
             <li
-              key={name}
+              key={`${name}-${index}`}
               style={{
                 display: "flex",
                 flexDirection: "column",

@@ -20,38 +20,39 @@ function ConvertToMp3({ setFileId, setStems, setStatusMessage, setIsProcessing }
 
     setStatus("loading");
     setError(null);
-    if (setStatusMessage) setStatusMessage("Downloading audio…");
-    if (setIsProcessing) setIsProcessing(true);
+    if (typeof setStatusMessage === "function") setStatusMessage("Downloading audio…");
+    if (typeof setIsProcessing === "function") setIsProcessing(true);
 
     try {
-      if (setStatusMessage) setStatusMessage("Converting to mp3…");
+      if (typeof setStatusMessage === "function") setStatusMessage("Converting to mp3…");
       const result = await importYouTubeAudio(url);
       if (!result || result.file_id == null) {
         setError("Invalid response from server.");
         setStatus("error");
-        if (setStatusMessage) setStatusMessage("Invalid response from server.");
+        if (typeof setStatusMessage === "function") setStatusMessage("Invalid response from server.");
         return;
       }
       const fileId = result.file_id;
-      const filename = result.stored_filename || result.original_filename || "audio.mp3";
+      const filename = (result.stored_filename || result.original_filename) || "audio.mp3";
 
-      setFileId(fileId);
+      if (typeof setFileId === "function") setFileId(fileId);
       setImportedFilename(filename);
-      if (setStatusMessage) setStatusMessage("Splitting stems…");
+      if (typeof setStatusMessage === "function") setStatusMessage("Splitting stems…");
 
       const splitResult = await splitTrack(fileId);
-      const stemList = Array.isArray(splitResult?.stems) ? splitResult.stems : [];
-      if (setStems) setStems(stemList);
+      const stemList = Array.isArray(splitResult && splitResult.stems) ? splitResult.stems : [];
+      if (typeof setStems === "function") setStems(stemList);
 
       setStatus("success");
-      if (setStatusMessage) setStatusMessage("Processing complete. Stems are ready.");
+      if (typeof setStatusMessage === "function") setStatusMessage("Processing complete. Stems are ready.");
     } catch (e) {
-      const message = e?.message || "Import failed.";
+      console.error("[ConvertToMp3] import/split failed:", e);
+      const message = (e && e.message) || "Import failed.";
       setError(message);
       setStatus("error");
-      if (setStatusMessage) setStatusMessage(message);
+      if (typeof setStatusMessage === "function") setStatusMessage(message);
     } finally {
-      if (setIsProcessing) setIsProcessing(false);
+      if (typeof setIsProcessing === "function") setIsProcessing(false);
     }
   };
 

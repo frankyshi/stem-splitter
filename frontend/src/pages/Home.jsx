@@ -56,7 +56,7 @@ function Home() {
           statusMessage={statusMessage}
         />
 
-        <StemPlayer fileId={fileId} stems={stems} />
+        <StemPlayer fileId={fileId} stems={Array.isArray(stems) ? stems : []} />
       </section>
     </main>
   );

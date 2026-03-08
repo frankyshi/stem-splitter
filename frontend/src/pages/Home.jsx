@@ -44,6 +44,7 @@ function Home() {
 
         <UploadAudio
           fileId={fileId}
+          isProcessing={isProcessing}
           setFileId={setFileId}
           setIsProcessing={setIsProcessing}
           setStems={setStems}

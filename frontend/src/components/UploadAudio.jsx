@@ -3,6 +3,7 @@ import { uploadAudio, splitTrack } from "../services/api.js";
 
 function UploadAudio({
   fileId,
+  isProcessing,
   setFileId,
   setIsProcessing,
   setStems,

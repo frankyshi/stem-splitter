@@ -28,9 +28,7 @@ export async function importYouTubeAudio(url) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url: url.trim() })
   });
-  const data = await handleJsonResponse(response);
-  console.log("[api] importYouTubeAudio response ok, keys:", data ? Object.keys(data) : "null");
-  return data;
+  return handleJsonResponse(response);
 }
 
 export async function uploadAudio(file) {

@@ -13,6 +13,7 @@ router = APIRouter(tags=["upload"])
 async def download_original(file_id: str):
     """
     Serve the original uploaded/imported audio file (e.g. mp3) for preview and download.
+    Content-Disposition: attachment so the "Download mp3" link triggers a download.
     """
     uploads_root = Path(UPLOADS_DIR)
     if not uploads_root.exists():
@@ -29,6 +30,7 @@ async def download_original(file_id: str):
         path,
         media_type="audio/mpeg",
         filename=path.name,
+        headers={"Content-Disposition": f'attachment; filename="{path.name}"'},
     )
 
 

@@ -26,10 +26,10 @@ function ProcessingStatus({ isProcessing, fileId, statusMessage }) {
         {statusMessage
           ? statusMessage
           : isProcessing
-          ? "Processing your track…"
+          ? "Splitting stems… longer songs can take a few minutes on CPU."
           : fileId
           ? "Processing complete. Stems are ready to preview or download."
-          : "Waiting for an upload."}
+          : "Upload a file above to split into stems."}
       </p>
 
       {fileId && (

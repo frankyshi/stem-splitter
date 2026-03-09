@@ -35,7 +35,7 @@ function Home() {
           </p>
         </header>
 
-        <ConvertToMp3 setFileId={setFileId} setStatusMessage={setStatusMessage} />
+        <ConvertToMp3 />
 
         <UploadAudio
           fileId={fileId}

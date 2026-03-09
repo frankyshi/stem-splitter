@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { uploadAudio, splitTrack } from "../services/api.js";
 
+/**
+ * Section: "Convert mp3 to stems". Single flow: pick file → Upload & Split.
+ */
 function UploadAudio({
   fileId,
   isProcessing,
@@ -15,24 +18,6 @@ function UploadAudio({
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files?.[0] ?? null);
     setError(null);
-  };
-
-  const runSplitOnly = async () => {
-    if (!fileId) return;
-    try {
-      setIsProcessing(true);
-      setError(null);
-      if (setStatusMessage) setStatusMessage("Splitting stems…");
-      const splitResult = await splitTrack(fileId);
-      setStems(Array.isArray(splitResult?.stems) ? splitResult.stems : []);
-      if (setStatusMessage) setStatusMessage("Processing complete. Stems are ready.");
-    } catch (e) {
-      const message = e?.message || "Stem splitting failed.";
-      setError(message);
-      if (setStatusMessage) setStatusMessage(message);
-    } finally {
-      setIsProcessing(false);
-    }
   };
 
   const handleUpload = async () => {
@@ -52,9 +37,7 @@ function UploadAudio({
       const newFileId = uploadResult.file_id;
       setFileId(newFileId);
 
-      if (setStatusMessage) {
-        setStatusMessage("Splitting track into stems…");
-      }
+      if (setStatusMessage) setStatusMessage("Splitting stems… longer songs can take a few minutes on CPU.");
 
       const splitResult = await splitTrack(newFileId);
       setStems(Array.isArray(splitResult?.stems) ? splitResult.stems : []);
@@ -87,7 +70,7 @@ function UploadAudio({
         Convert mp3 to stems
       </h2>
       <p style={{ fontSize: "0.9rem", color: "#9ca3af", marginBottom: "1rem" }}>
-        Upload an audio file, or use the mp3 from above, then split into separate stems.
+        Upload an audio file to split into separate stems (vocals, drums, bass, other).
       </p>
 
       <div
@@ -102,48 +85,31 @@ function UploadAudio({
           type="file"
           accept="audio/*"
           onChange={handleFileChange}
+          disabled={isProcessing}
           style={{
             color: "#e5e7eb",
-            maxWidth: "100%"
+            maxWidth: "100%",
+            opacity: isProcessing ? 0.6 : 1
           }}
         />
         <button
           type="button"
           onClick={handleUpload}
-          disabled={!selectedFile}
+          disabled={!selectedFile || isProcessing}
           style={{
             padding: "0.6rem 1.4rem",
             borderRadius: "999px",
             border: "none",
-            cursor: selectedFile ? "pointer" : "not-allowed",
+            cursor: selectedFile && !isProcessing ? "pointer" : "not-allowed",
             background:
               "linear-gradient(135deg, #22c55e, #16a34a, #22c55e, #22d3ee)",
             color: "#020617",
             fontWeight: 600,
-            opacity: selectedFile ? 1 : 0.5
+            opacity: selectedFile && !isProcessing ? 1 : 0.5
           }}
         >
-          Upload & Split
+          {isProcessing ? "Processing…" : "Upload & Split"}
         </button>
-        {fileId && (
-          <button
-            type="button"
-            onClick={runSplitOnly}
-            disabled={isProcessing}
-            style={{
-              padding: "0.6rem 1.4rem",
-              borderRadius: "999px",
-              border: "1px solid rgba(148, 163, 184, 0.7)",
-              backgroundColor: "transparent",
-              color: "#e5e7eb",
-              cursor: isProcessing ? "not-allowed" : "pointer",
-              fontWeight: 600,
-              opacity: isProcessing ? 0.5 : 1
-            }}
-          >
-            Split to stems
-          </button>
-        )}
       </div>
 
       {error && (
@@ -152,7 +118,7 @@ function UploadAudio({
         </p>
       )}
 
-      {fileId && (
+      {fileId && !isProcessing && (
         <p
           style={{
             marginTop: "0.75rem",
@@ -160,7 +126,7 @@ function UploadAudio({
             color: "#6b7280"
           }}
         >
-          Current file ID: <code>{fileId}</code>
+          Last file: <code>{fileId}</code>
         </p>
       )}
     </section>

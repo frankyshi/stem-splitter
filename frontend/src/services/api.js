@@ -31,6 +31,16 @@ export async function importYouTubeAudio(url) {
   return handleJsonResponse(response);
 }
 
+export async function convertMp4ToMp3(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(`${API_BASE}/import/mp4`, {
+    method: "POST",
+    body: formData
+  });
+  return handleJsonResponse(response);
+}
+
 export async function uploadAudio(file) {
   const formData = new FormData();
   formData.append("file", file);

@@ -1,5 +1,40 @@
 import { downloadStem } from "../services/api.js";
 
+const cardStyle = {
+  backgroundColor: "var(--color-surface)",
+  borderRadius: "var(--radius-card)",
+  padding: "1.75rem",
+  border: "1px solid var(--color-surface-border)",
+  boxShadow: "var(--shadow-card)"
+};
+
+const sectionTitleStyle = {
+  fontFamily: "var(--font-heading)",
+  fontSize: "1.35rem",
+  marginBottom: "0.5rem",
+  color: "var(--color-text)",
+  fontWeight: "normal",
+  letterSpacing: "0.02em"
+};
+
+const bodyTextStyle = {
+  fontFamily: "var(--font-body)",
+  fontSize: "0.9rem",
+  color: "var(--color-text-muted)",
+  lineHeight: 1.5
+};
+
+const secondaryButtonStyle = {
+  padding: "0.45rem 1rem",
+  borderRadius: "var(--radius-button)",
+  border: "1px solid var(--color-surface-border-strong)",
+  backgroundColor: "transparent",
+  color: "var(--color-text)",
+  fontFamily: "var(--font-body)",
+  fontSize: "0.85rem",
+  cursor: "pointer"
+};
+
 function StemPlayer({ fileId, stems }) {
   const safeStems = Array.isArray(stems) ? stems : [];
   if (fileId == null || fileId === "" || safeStems.length === 0) {
@@ -11,18 +46,9 @@ function StemPlayer({ fileId, stems }) {
   };
 
   return (
-    <section
-      style={{
-        backgroundColor: "rgba(15, 23, 42, 0.9)",
-        borderRadius: "1rem",
-        padding: "1.5rem",
-        border: "1px solid rgba(148, 163, 184, 0.2)"
-      }}
-    >
-      <h2 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
-        Stems preview & download
-      </h2>
-      <p style={{ fontSize: "0.9rem", color: "#9ca3af", marginBottom: "1rem" }}>
+    <section style={cardStyle}>
+      <h2 style={sectionTitleStyle}>Stems preview & download</h2>
+      <p style={{ ...bodyTextStyle, marginBottom: "1.25rem" }}>
         Preview and download the separated stems below.
       </p>
 
@@ -37,8 +63,8 @@ function StemPlayer({ fileId, stems }) {
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.75rem",
-                padding: "0.9rem 0",
-                borderBottom: "1px solid rgba(30, 64, 175, 0.25)"
+                padding: "1rem 0",
+                borderBottom: "1px solid var(--color-surface-border)"
               }}
             >
               <div
@@ -46,39 +72,24 @@ function StemPlayer({ fileId, stems }) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  gap: "1rem"
+                  gap: "1rem",
+                  flexWrap: "wrap"
                 }}
               >
                 <div>
-                  <span style={{ fontWeight: 500 }}>{name}</span>
-                  <span
-                    style={{
-                      marginLeft: "0.5rem",
-                      fontSize: "0.8rem",
-                      color: "#6b7280"
-                    }}
-                  >
+                  <span style={{ fontFamily: "var(--font-body)", fontWeight: 600, color: "var(--color-text)" }}>{name}</span>
+                  <span style={{ marginLeft: "0.5rem", fontSize: "0.8rem", color: "var(--color-text-dim)", fontFamily: "var(--font-body)" }}>
                     ({stem.filename ?? ""})
                   </span>
                 </div>
-
                 <button
                   type="button"
                   onClick={() => handleDownload(stem)}
-                  style={{
-                    padding: "0.4rem 1rem",
-                    borderRadius: "999px",
-                    border: "1px solid rgba(148, 163, 184, 0.7)",
-                    backgroundColor: "transparent",
-                    color: "#e5e7eb",
-                    cursor: "pointer",
-                    fontSize: "0.85rem"
-                  }}
+                  style={secondaryButtonStyle}
                 >
                   Download
                 </button>
               </div>
-
               <audio controls src={stem.url ?? ""} style={{ width: "100%" }} />
             </li>
           );

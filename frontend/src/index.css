@@ -1,0 +1,67 @@
+/* Stem Splitter — design tokens and typography */
+/* Place CollegiateBlackFLF font files in public/fonts/ (e.g. CollegiateBlackFLF.woff2) */
+
+@font-face {
+  font-family: "CollegiateBlackFLF";
+  src: url("/fonts/CollegiateBlackFLF.woff2") format("woff2"),
+       url("/fonts/CollegiateBlackFLF.woff") format("woff"),
+       url("/fonts/CollegiateBlackFLF.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Palette: black, light gray, purple accent */
+  --color-bg: #0a0a0f;
+  --color-bg-elevated: #12121a;
+  --color-surface: rgba(18, 18, 26, 0.95);
+  --color-surface-border: rgba(139, 92, 246, 0.15);
+  --color-surface-border-strong: rgba(139, 92, 246, 0.35);
+  --color-text: #f4f4f5;
+  --color-text-muted: #a1a1aa;
+  --color-text-dim: #71717a;
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #a78bfa;
+  --color-accent-subtle: rgba(139, 92, 246, 0.2);
+  --color-success: #22c55e;
+  --color-error: #f87171;
+  --font-heading: "CollegiateBlackFLF", "Georgia", serif;
+  --font-body: "Times New Roman", "Times", serif;
+  --radius-card: 12px;
+  --radius-button: 8px;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.06);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.1);
+}
+
+/* Base reset for consistent typography */
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Polished file input (hide default, style label as button) */
+.stem-splitter-file-wrap {
+  position: relative;
+  display: inline-block;
+}
+.stem-splitter-file-wrap input[type="file"] {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+.stem-splitter-file-wrap input[type="file"]:disabled + label {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Audio element consistency */
+audio {
+  border-radius: var(--radius-button);
+  background: var(--color-bg-elevated);
+}

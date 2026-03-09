@@ -18,20 +18,48 @@ function Home() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
-        padding: "2rem 1rem",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-        background:
-          "radial-gradient(circle at top, #1e293b 0, #020617 40%, #000 100%)",
-        color: "#e5e7eb"
+        padding: "3rem 1.5rem",
+        fontFamily: "var(--font-body)",
+        background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139, 92, 246, 0.07) 0%, transparent 50%), var(--color-bg)",
+        color: "var(--color-text)"
       }}
     >
-      <section style={{ maxWidth: "960px", width: "100%" }}>
-        <header style={{ marginBottom: "2rem", textAlign: "center" }}>
-          <h1 style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>
+      <section style={{ maxWidth: "920px", width: "100%" }}>
+        {/* Hero: title + tagline. Alternatives: "Separate any track into stems. Convert, split, and download." | "Turn any audio into isolated stems—vocals, drums, bass, and more." | "Convert sources to MP3. Split tracks into stems. Professional separation in one place." */}
+        <header
+          style={{
+            marginBottom: "3rem",
+            textAlign: "center",
+            paddingBottom: "2rem",
+            borderBottom: "1px solid var(--color-surface-border)"
+          }}
+        >
+          <h1
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(2.25rem, 5vw, 3.25rem)",
+              fontWeight: "normal",
+              letterSpacing: "0.02em",
+              margin: "0 0 0.75rem",
+              color: "var(--color-text)",
+              textShadow: "0 0 40px var(--color-accent-subtle)"
+            }}
+          >
             Stem Splitter
           </h1>
-          <p style={{ color: "#9ca3af" }}>
-            Import from YouTube or upload a track, then split it into stems and preview or download.
+          <p
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              color: "var(--color-text-muted)",
+              margin: 0,
+              maxWidth: "36ch",
+              marginLeft: "auto",
+              marginRight: "auto"
+            }}
+          >
+            Convert any source to MP3, then split into stems—vocals, drums, bass, and more.
           </p>
         </header>
 
@@ -59,4 +87,3 @@ function Home() {
 }
 
 export default Home;
-

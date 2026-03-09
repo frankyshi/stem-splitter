@@ -12,6 +12,7 @@ function Home() {
 
   return (
     <main
+      className="stem-splitter-page"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -20,12 +21,25 @@ function Home() {
         justifyContent: "flex-start",
         padding: "3rem 1.5rem",
         fontFamily: "var(--font-body)",
-        background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139, 92, 246, 0.07) 0%, transparent 50%), var(--color-bg)",
         color: "var(--color-text)"
       }}
     >
-      <section style={{ maxWidth: "920px", width: "100%" }}>
-        {/* Hero: title + tagline. Alternatives: "Separate any track into stems. Convert, split, and download." | "Turn any audio into isolated stems—vocals, drums, bass, and more." | "Convert sources to MP3. Split tracks into stems. Professional separation in one place." */}
+      {/* Layered gradient background */}
+      <div className="stem-splitter-bg" aria-hidden="true" />
+
+      {/* Floating decorative layer — replace .floating-art-panel with img or background-image for custom assets */}
+      <div className="stem-splitter-bg-art" aria-hidden="true">
+        <div className="floating-art-panel floating-art-panel--1" />
+        <div className="floating-art-panel floating-art-panel--2" />
+        <div className="floating-art-panel floating-art-panel--3" />
+        <div className="floating-art-panel floating-art-panel--4" />
+        <div className="floating-art-panel floating-art-panel--5" />
+      </div>
+
+      <div
+        className="stem-splitter-content"
+        style={{ maxWidth: "920px", width: "100%" }}
+      >
         <header
           style={{
             marginBottom: "3rem",
@@ -38,11 +52,12 @@ function Home() {
             style={{
               fontFamily: "var(--font-heading)",
               fontSize: "clamp(2.25rem, 5vw, 3.25rem)",
-              fontWeight: "normal",
-              letterSpacing: "0.02em",
+              fontWeight: 700,
+              letterSpacing: "0.08em",
               margin: "0 0 0.75rem",
               color: "var(--color-text)",
-              textShadow: "0 0 40px var(--color-accent-subtle)"
+              textTransform: "uppercase",
+              textShadow: "0 0 48px var(--color-accent-subtle)"
             }}
           >
             Stem Splitter
@@ -81,7 +96,7 @@ function Home() {
         />
 
         <StemPlayer fileId={fileId} stems={Array.isArray(stems) ? stems : []} />
-      </section>
+      </div>
     </main>
   );
 }

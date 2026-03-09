@@ -1,5 +1,6 @@
-/* Stem Splitter — design tokens and typography */
-/* Place CollegiateBlackFLF font files in public/fonts/ (e.g. CollegiateBlackFLF.woff2) */
+/* Stem Splitter — design tokens, typography, background system */
+/* Place CollegiateBlackFLF font files in public/fonts/ */
+/* Floating art panels: swap .floating-art-panel background or replace with <img> for custom assets */
 
 @font-face {
   font-family: "CollegiateBlackFLF";
@@ -12,37 +13,155 @@
 }
 
 :root {
-  /* Palette: black, light gray, purple accent */
-  --color-bg: #0a0a0f;
-  --color-bg-elevated: #12121a;
-  --color-surface: rgba(18, 18, 26, 0.95);
-  --color-surface-border: rgba(139, 92, 246, 0.15);
-  --color-surface-border-strong: rgba(139, 92, 246, 0.35);
+  --color-bg: #050508;
+  --color-bg-elevated: #0f0f14;
+  --color-surface: rgba(15, 15, 22, 0.92);
+  --color-surface-border: rgba(139, 92, 246, 0.18);
+  --color-surface-border-strong: rgba(139, 92, 246, 0.4);
   --color-text: #f4f4f5;
   --color-text-muted: #a1a1aa;
   --color-text-dim: #71717a;
   --color-accent: #8b5cf6;
   --color-accent-hover: #a78bfa;
-  --color-accent-subtle: rgba(139, 92, 246, 0.2);
+  --color-accent-subtle: rgba(139, 92, 246, 0.25);
   --color-success: #22c55e;
   --color-error: #f87171;
   --font-heading: "CollegiateBlackFLF", "Georgia", serif;
   --font-body: "Times New Roman", "Times", serif;
-  --radius-card: 12px;
+  --radius-card: 14px;
   --radius-button: 8px;
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.06);
-  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.1);
+  /* Stronger card depth: shadow + subtle purple glow */
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.08), 0 0 60px -12px rgba(139, 92, 246, 0.12);
+  --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(139, 92, 246, 0.12), 0 0 80px -8px rgba(139, 92, 246, 0.18);
 }
 
-/* Base reset for consistent typography */
 body {
   margin: 0;
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Polished file input (hide default, style label as button) */
+/* ---- Page layout: background layers + content ---- */
+.stem-splitter-page {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+/* Base layered gradient background (fixed, behind everything) */
+.stem-splitter-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(88, 28, 135, 0.35) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 80% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 20% 80%, rgba(109, 40, 217, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a12 0%, #050508 50%, #030305 100%);
+}
+
+/* Floating decorative layer: placeholder panels (replace with img or background-image later) */
+.stem-splitter-bg-art {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Placeholder art panel — swap background-image or use <img> inside for album-style assets */
+.floating-art-panel {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.35;
+  will-change: transform;
+  /* Placeholder: gradient blob; replace with background-image: url(...) for real assets */
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(88, 28, 135, 0.3) 50%, transparent 70%);
+}
+
+.floating-art-panel--1 {
+  width: min(50vw, 420px);
+  height: min(50vw, 420px);
+  top: 5%;
+  left: -5%;
+  animation: float-slow 28s ease-in-out infinite;
+}
+
+.floating-art-panel--2 {
+  width: min(45vw, 380px);
+  height: min(45vw, 380px);
+  top: 15%;
+  right: -8%;
+  animation: float-slower 34s ease-in-out infinite;
+  animation-delay: -8s;
+}
+
+.floating-art-panel--3 {
+  width: min(40vw, 320px);
+  height: min(40vw, 320px);
+  bottom: 10%;
+  left: 10%;
+  animation: drift 38s ease-in-out infinite;
+  animation-delay: -15s;
+}
+
+.floating-art-panel--4 {
+  width: min(35vw, 280px);
+  height: min(35vw, 280px);
+  bottom: 20%;
+  right: 5%;
+  animation: float-slow 32s ease-in-out infinite;
+  animation-delay: -20s;
+}
+
+/* Optional: center ambient glow (opacity-only animation so transform centering is preserved) */
+.floating-art-panel--5 {
+  width: min(60vw, 500px);
+  height: min(60vw, 500px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.15;
+  animation: ambient-pulse 8s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(3%, 4%) scale(1.02); }
+  66% { transform: translate(-2%, -3%) scale(0.98); }
+}
+
+@keyframes float-slower {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-4%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(3%, 2%); }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(2%, 3%); }
+  40% { transform: translate(-3%, -2%); }
+  60% { transform: translate(-2%, 2%); }
+  80% { transform: translate(3%, -1%); }
+}
+
+@keyframes ambient-pulse {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.2; }
+}
+
+/* Content above background */
+.stem-splitter-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* File input helper */
 .stem-splitter-file-wrap {
   position: relative;
   display: inline-block;
@@ -60,7 +179,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Audio element consistency */
 audio {
   border-radius: var(--radius-button);
   background: var(--color-bg-elevated);

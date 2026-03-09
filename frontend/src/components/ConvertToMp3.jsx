@@ -7,25 +7,28 @@ const cardStyle = {
   padding: "1.75rem",
   marginBottom: "1.5rem",
   boxShadow: "var(--shadow-card)",
-  border: "1px solid var(--color-surface-border)"
+  border: "1px solid var(--color-surface-border)",
+  backdropFilter: "blur(12px)"
 };
 
 const sectionTitleStyle = {
   fontFamily: "var(--font-heading)",
-  fontSize: "1.35rem",
+  fontSize: "1.25rem",
   marginBottom: "0.5rem",
   color: "var(--color-text)",
-  fontWeight: "normal",
-  letterSpacing: "0.02em"
+  fontWeight: 700,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase"
 };
 
 const subsectionHeadingStyle = {
   fontFamily: "var(--font-heading)",
-  fontSize: "1.05rem",
-  fontWeight: "normal",
+  fontSize: "1rem",
+  fontWeight: 700,
   color: "var(--color-text)",
   marginBottom: "0.6rem",
-  letterSpacing: "0.01em"
+  letterSpacing: "0.04em",
+  textTransform: "uppercase"
 };
 
 const bodyTextStyle = {

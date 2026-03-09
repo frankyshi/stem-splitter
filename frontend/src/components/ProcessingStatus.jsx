@@ -11,16 +11,19 @@ function ProcessingStatus({ isProcessing, fileId, statusMessage }) {
         padding: "1.25rem 1.75rem",
         marginBottom: "1.5rem",
         border: "1px solid var(--color-surface-border)",
-        boxShadow: "var(--shadow-card)"
+        boxShadow: "var(--shadow-card)",
+        backdropFilter: "blur(12px)"
       }}
     >
       <h2
         style={{
           fontFamily: "var(--font-heading)",
-          fontSize: "1.1rem",
+          fontSize: "1.05rem",
           marginBottom: "0.5rem",
           color: "var(--color-text)",
-          fontWeight: "normal"
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+          textTransform: "uppercase"
         }}
       >
         Processing status

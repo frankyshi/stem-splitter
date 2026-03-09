@@ -5,16 +5,18 @@ const cardStyle = {
   borderRadius: "var(--radius-card)",
   padding: "1.75rem",
   border: "1px solid var(--color-surface-border)",
-  boxShadow: "var(--shadow-card)"
+  boxShadow: "var(--shadow-card)",
+  backdropFilter: "blur(12px)"
 };
 
 const sectionTitleStyle = {
   fontFamily: "var(--font-heading)",
-  fontSize: "1.35rem",
+  fontSize: "1.25rem",
   marginBottom: "0.5rem",
   color: "var(--color-text)",
-  fontWeight: "normal",
-  letterSpacing: "0.02em"
+  fontWeight: 700,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase"
 };
 
 const bodyTextStyle = {

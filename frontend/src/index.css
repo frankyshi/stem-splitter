@@ -63,7 +63,7 @@ body {
     linear-gradient(180deg, #0a0a12 0%, #050508 50%, #030305 100%);
 }
 
-/* Floating decorative layer: placeholder panels (replace with img or background-image later) */
+/* Floating album-art layer: images in curated slots, slow drift, behind content */
 .stem-splitter-bg-art {
   position: fixed;
   inset: 0;
@@ -72,61 +72,55 @@ body {
   overflow: hidden;
 }
 
-/* Placeholder art panel — swap background-image or use <img> inside for album-style assets */
-.floating-art-panel {
+/* Gradient overlay so images blend and content stays readable */
+.stem-splitter-bg-art::after {
+  content: "";
   position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.35;
+  inset: 0;
+  background: radial-gradient(ellipse 100% 80% at 50% 40%, transparent 30%, rgba(5, 5, 8, 0.5) 80%, rgba(5, 5, 8, 0.85) 100%);
+  pointer-events: none;
+}
+
+.floating-art-img-wrap {
+  position: absolute;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.08);
   will-change: transform;
-  /* Placeholder: gradient blob; replace with background-image: url(...) for real assets */
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(88, 28, 135, 0.3) 50%, transparent 70%);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 
-.floating-art-panel--1 {
-  width: min(50vw, 420px);
-  height: min(50vw, 420px);
-  top: 5%;
-  left: -5%;
-  animation: float-slow 28s ease-in-out infinite;
+.floating-art-img-wrap--float-slow {
+  animation-name: float-slow;
 }
 
-.floating-art-panel--2 {
-  width: min(45vw, 380px);
-  height: min(45vw, 380px);
-  top: 15%;
-  right: -8%;
-  animation: float-slower 34s ease-in-out infinite;
-  animation-delay: -8s;
+.floating-art-img-wrap--float-slower {
+  animation-name: float-slower;
 }
 
-.floating-art-panel--3 {
-  width: min(40vw, 320px);
-  height: min(40vw, 320px);
-  bottom: 10%;
-  left: 10%;
-  animation: drift 38s ease-in-out infinite;
-  animation-delay: -15s;
+.floating-art-img-wrap--drift {
+  animation-name: drift;
 }
 
-.floating-art-panel--4 {
-  width: min(35vw, 280px);
-  height: min(35vw, 280px);
-  bottom: 20%;
-  right: 5%;
-  animation: float-slow 32s ease-in-out infinite;
-  animation-delay: -20s;
+.floating-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.85) saturate(0.9);
 }
 
-/* Optional: center ambient glow (opacity-only animation so transform centering is preserved) */
-.floating-art-panel--5 {
-  width: min(60vw, 500px);
-  height: min(60vw, 500px);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.15;
-  animation: ambient-pulse 8s ease-in-out infinite;
+/* Fewer, smaller images on small screens to avoid clutter */
+@media (max-width: 768px) {
+  .floating-art-img-wrap:nth-child(n+4) {
+    display: none;
+  }
+
+  .floating-art-img-wrap {
+    width: clamp(90px, 22vw, 140px) !important;
+    height: clamp(90px, 22vw, 140px) !important;
+  }
 }
 
 @keyframes float-slow {

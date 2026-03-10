@@ -4,6 +4,16 @@ import ProcessingStatus from "../components/ProcessingStatus.jsx";
 import StemPlayer from "../components/StemPlayer.jsx";
 import { useState } from "react";
 
+/* Curated slots so images stay well-separated; center (content area) kept clear. */
+const FLOATING_ART_CONFIG = [
+  { src: "/images/mbdtf.jpg", top: "6%", left: "3%", size: "clamp(120px, 16vw, 220px)", anim: "float-slow", duration: 28, delay: 0, opacity: 0.28 },
+  { src: "/images/tpab.jpg", top: "10%", left: "78%", size: "clamp(100px, 14vw, 200px)", anim: "float-slower", duration: 34, delay: -8, opacity: 0.26 },
+  { src: "/images/astroworld.jpg", top: "54%", left: "0%", size: "clamp(110px, 15vw, 210px)", anim: "drift", duration: 36, delay: -12, opacity: 0.24 },
+  { src: "/images/graduation.jpg", top: "48%", left: "82%", size: "clamp(100px, 14vw, 190px)", anim: "float-slow", duration: 30, delay: -18, opacity: 0.27 },
+  { src: "/images/damn.jpg", top: "76%", left: "5%", size: "clamp(100px, 14vw, 195px)", anim: "float-slower", duration: 32, delay: -5, opacity: 0.25 },
+  { src: "/images/iamiwas.jpg", top: "74%", left: "72%", size: "clamp(110px, 15vw, 205px)", anim: "drift", duration: 38, delay: -22, opacity: 0.26 },
+];
+
 function Home() {
   const [fileId, setFileId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -24,16 +34,26 @@ function Home() {
         color: "var(--color-text)"
       }}
     >
-      {/* Layered gradient background */}
       <div className="stem-splitter-bg" aria-hidden="true" />
 
-      {/* Floating decorative layer — replace .floating-art-panel with img or background-image for custom assets */}
       <div className="stem-splitter-bg-art" aria-hidden="true">
-        <div className="floating-art-panel floating-art-panel--1" />
-        <div className="floating-art-panel floating-art-panel--2" />
-        <div className="floating-art-panel floating-art-panel--3" />
-        <div className="floating-art-panel floating-art-panel--4" />
-        <div className="floating-art-panel floating-art-panel--5" />
+        {FLOATING_ART_CONFIG.map((item, i) => (
+          <div
+            key={item.src + i}
+            className={`floating-art-img-wrap floating-art-img-wrap--${item.anim}`}
+            style={{
+              top: item.top,
+              left: item.left,
+              width: item.size,
+              height: item.size,
+              opacity: item.opacity,
+              animationDuration: `${item.duration}s`,
+              animationDelay: `${item.delay}s`,
+            }}
+          >
+            <img src={item.src} alt="" className="floating-art-img" />
+          </div>
+        ))}
       </div>
 
       <div

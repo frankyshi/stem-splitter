@@ -141,9 +141,10 @@ At a high level:
 
 ## Troubleshooting
 
-### YouTube import: 403 Forbidden or "video may be unavailable or restricted"
+### YouTube import: common failures
 
-The app uses the `web_embedded` player client to reduce 403 errors. If imports still fail:
+YouTube frequently changes how videos are served, so yt-dlp may need different
+strategies or cookies to succeed.
 
 1. **Update yt-dlp** to the latest version (YouTube changes often; newer releases include fixes):
    ```bash
@@ -151,4 +152,10 @@ The app uses the `web_embedded` player client to reduce 403 errors. If imports s
    # or: brew upgrade yt-dlp
    ```
 2. Use **Python 3.10+** for the backend (yt-dlp has deprecated 3.9; some fixes require 3.10+).
-3. Some videos have embedding disabled and cannot be downloaded with `web_embedded`; try another video or upload the file directly.
+3. Some videos cannot be accessed via embedded players (`web_embedded`) and will
+   return errors like `Error code: 152 - 18` or "Watch video on YouTube". Try
+   another public video or configure cookies so yt-dlp can reuse your browser
+   session.
+4. For videos that require login/age confirmation, set an env var such as
+   `YTDLP_COOKIES_FROM_BROWSER=chrome` (or `firefox`, `safari`, etc.) so the
+   backend can fall back to `--cookies-from-browser` when needed.

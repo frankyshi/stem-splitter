@@ -6,21 +6,38 @@ function ProcessingStatus({ isProcessing, fileId, statusMessage }) {
   return (
     <section
       style={{
-        backgroundColor: "rgba(15, 23, 42, 0.9)",
-        borderRadius: "1rem",
-        padding: "1rem 1.5rem",
-        marginBottom: "1.5rem",
-        border: "1px solid rgba(148, 163, 184, 0.2)"
+        background:
+          "radial-gradient(circle at top left, rgba(79, 70, 229, 0.26), transparent 55%), " +
+          "radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.14), transparent 55%), " +
+          "var(--color-surface)",
+        borderRadius: "var(--radius-card)",
+        padding: "1.3rem 1.8rem",
+        marginBottom: "1.6rem",
+        border: "1px solid var(--color-surface-border)",
+        boxShadow: "var(--shadow-card)",
+        backdropFilter: "blur(18px)"
       }}
     >
-      <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>
+      <h2
+        style={{
+          fontFamily: "var(--font-heading)",
+          fontSize: "1rem",
+          marginBottom: "0.45rem",
+          color: "var(--color-text)",
+          fontWeight: 600,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase"
+        }}
+      >
         Processing status
       </h2>
 
       <p
         style={{
-          color: isProcessing ? "#22c55e" : "#9ca3af",
-          fontSize: "0.95rem"
+          fontFamily: "var(--font-body)",
+          color: isProcessing ? "var(--color-success)" : "var(--color-text-muted)",
+          fontSize: "0.95rem",
+          margin: 0
         }}
       >
         {statusMessage
@@ -37,10 +54,11 @@ function ProcessingStatus({ isProcessing, fileId, statusMessage }) {
           style={{
             marginTop: "0.5rem",
             fontSize: "0.8rem",
-            color: "#6b7280"
+            color: "var(--color-text-dim)",
+            fontFamily: "var(--font-body)"
           }}
         >
-          File ID: <code>{fileId}</code>
+          File ID: <code style={{ background: "var(--color-bg-elevated)", padding: "0.15rem 0.35rem", borderRadius: "4px" }}>{fileId}</code>
         </p>
       )}
     </section>
@@ -48,4 +66,3 @@ function ProcessingStatus({ isProcessing, fileId, statusMessage }) {
 }
 
 export default ProcessingStatus;
-

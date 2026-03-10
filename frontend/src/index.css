@@ -1,0 +1,132 @@
+/* Stem Splitter — design tokens, typography, background system */
+/* Place CollegiateBlackFLF font files in public/fonts/ */
+/* Floating art panels: swap .floating-art-panel background or replace with <img> for custom assets */
+
+@font-face {
+  font-family: "CollegiateBlackFLF";
+  src: url("/fonts/CollegiateBlackFLF.woff2") format("woff2"),
+       url("/fonts/CollegiateBlackFLF.woff") format("woff"),
+       url("/fonts/CollegiateBlackFLF.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Hero title: Acme; UI: Space Grotesk + Inter */
+@import url("https://fonts.googleapis.com/css2?family=Acme&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --color-bg: #050508;
+  --color-bg-elevated: #0b0b12;
+  --color-surface: rgba(18, 16, 28, 0.96);
+  --color-surface-border: rgba(168, 85, 247, 0.4);
+  --color-surface-border-strong: rgba(196, 181, 253, 0.75);
+  --color-text: #f9fafb;
+  --color-text-muted: #a5b4fc;
+  --color-text-dim: #6b7280;
+  --color-accent: #a855f7;
+  --color-accent-hover: #c4b5fd;
+  --color-accent-subtle: rgba(168, 85, 247, 0.3);
+  --color-success: #22c55e;
+  --color-error: #f87171;
+  --font-display: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  --font-heading: var(--font-display);
+  --font-body: var(--font-sans);
+  --radius-card: 16px;
+  --radius-button: 999px;
+  /* Stronger card depth: layered shadow + subtle purple glow */
+  --shadow-card: 0 22px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(148, 163, 184, 0.24), 0 0 80px -24px rgba(168, 85, 247, 0.5);
+  --shadow-card-hover: 0 26px 70px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(196, 181, 253, 0.65), 0 0 110px -26px rgba(168, 85, 247, 0.85);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  color: var(--color-text);
+}
+
+/* ---- Page layout: background layers + content ---- */
+.stem-splitter-page {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+/* Layer 1: Base gradient + center vignette (readability). No overlay on top of images. */
+.stem-splitter-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(5, 5, 8, 0.25) 45%, rgba(5, 5, 8, 0.6) 100%),
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(88, 28, 135, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 20% 80%, rgba(109, 40, 217, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a12 0%, #050508 50%, #030305 100%);
+}
+
+/* Layer 2: Floating album-art — above base, below content. No overlay on this layer. */
+.stem-splitter-bg-art {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Flowing covers: position driven by JS (requestAnimationFrame); no CSS animation */
+.floating-art-img-wrap {
+  position: absolute;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.06);
+  will-change: left, top;
+}
+
+.floating-art-img-wrap--flow {
+  /* Motion is applied via inline left/top in JS */
+}
+
+.floating-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.97) saturate(1.02);
+}
+
+/* Content above floating art: opaque so covers are hidden when passing behind */
+.stem-splitter-content {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(5, 5, 8, 0.75) 0%, rgba(5, 5, 8, 0.85) 100%);
+  min-height: 0;
+}
+
+/* File input helper */
+.stem-splitter-file-wrap {
+  position: relative;
+  display: inline-block;
+}
+.stem-splitter-file-wrap input[type="file"] {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+.stem-splitter-file-wrap input[type="file"]:disabled + label {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+audio {
+  border-radius: var(--radius-button);
+  background: var(--color-bg-elevated);
+}

@@ -73,23 +73,18 @@ body {
   overflow: hidden;
 }
 
+/* Flowing covers: position driven by JS (requestAnimationFrame); no CSS animation */
 .floating-art-img-wrap {
   position: absolute;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(139, 92, 246, 0.06);
-  will-change: transform;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.06);
+  will-change: left, top;
 }
 
-.floating-art-img-wrap--drift-right { animation-name: art-drift-right; }
-.floating-art-img-wrap--drift-left { animation-name: art-drift-left; }
-.floating-art-img-wrap--drift-up { animation-name: art-drift-up; }
-.floating-art-img-wrap--drift-down { animation-name: art-drift-down; }
-.floating-art-img-wrap--drift-diagonal-a { animation-name: art-drift-diagonal-a; }
-.floating-art-img-wrap--drift-diagonal-b { animation-name: art-drift-diagonal-b; }
-.floating-art-img-wrap--float-arc { animation-name: art-float-arc; }
+.floating-art-img-wrap--flow {
+  /* Motion is applied via inline left/top in JS */
+}
 
 .floating-art-img {
   width: 100%;
@@ -99,60 +94,12 @@ body {
   filter: brightness(0.97) saturate(1.02);
 }
 
-/* Screensaver-style motion: real translation over long duration */
-@keyframes art-drift-right {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(14%, 3%); }
-}
-
-@keyframes art-drift-left {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-12%, -2%); }
-}
-
-@keyframes art-drift-up {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(2%, -12%); }
-}
-
-@keyframes art-drift-down {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-3%, 10%); }
-}
-
-@keyframes art-drift-diagonal-a {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(10%, -6%) rotate(1deg); }
-  75% { transform: translate(-6%, 8%) rotate(-0.5deg); }
-}
-
-@keyframes art-drift-diagonal-b {
-  0%, 100% { transform: translate(0, 0); }
-  33% { transform: translate(-10%, -8%); }
-  66% { transform: translate(6%, 6%); }
-}
-
-@keyframes art-float-arc {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(8%, 8%) rotate(2deg); }
-}
-
-/* Fewer, smaller images on small screens */
-@media (max-width: 768px) {
-  .floating-art-img-wrap:nth-child(n+7) {
-    display: none;
-  }
-
-  .floating-art-img-wrap {
-    width: clamp(72px, 18vw, 120px) !important;
-    height: clamp(72px, 18vw, 120px) !important;
-  }
-}
-
-/* Content above background */
+/* Content above floating art: opaque so covers are hidden when passing behind */
 .stem-splitter-content {
   position: relative;
   z-index: 2;
+  background: linear-gradient(180deg, rgba(5, 5, 8, 0.75) 0%, rgba(5, 5, 8, 0.85) 100%);
+  min-height: 0;
 }
 
 /* File input helper */

@@ -3,29 +3,29 @@ import UploadAudio from "../components/UploadAudio.jsx";
 import ProcessingStatus from "../components/ProcessingStatus.jsx";
 import StemPlayer from "../components/StemPlayer.jsx";
 import { useState } from "react";
+import { useFloatingCovers } from "../hooks/useFloatingCovers.js";
 
-/* Curated slots around viewport edges; center kept clear. Many images, varied size/opacity/drift. */
-const FLOATING_ART_CONFIG = [
-  { src: "/images/mbdtf.jpg", top: "4%", left: "2%", size: "clamp(100px, 12vw, 180px)", anim: "drift-right", duration: 62, delay: 0, opacity: 0.48 },
-  { src: "/images/tpab.jpg", top: "5%", left: "18%", size: "clamp(70px, 9vw, 130px)", anim: "drift-down", duration: 58, delay: -10, opacity: 0.42 },
-  { src: "/images/astroworld.jpg", top: "8%", left: "82%", size: "clamp(100px, 12vw, 180px)", anim: "drift-left", duration: 65, delay: -5, opacity: 0.45 },
-  { src: "/images/graduation.jpg", top: "12%", left: "92%", size: "clamp(70px, 9vw, 130px)", anim: "drift-up", duration: 60, delay: -15, opacity: 0.44 },
-  { src: "/images/808s%20and%20heartbreak.jpg", top: "25%", left: "0%", size: "clamp(120px, 15vw, 220px)", anim: "drift-diagonal-a", duration: 70, delay: -20, opacity: 0.4 },
-  { src: "/images/late%20registration.jpg", top: "28%", left: "88%", size: "clamp(100px, 12vw, 180px)", anim: "drift-diagonal-b", duration: 68, delay: -8, opacity: 0.46 },
-  { src: "/images/ye.jpg", top: "55%", left: "0%", size: "clamp(100px, 12vw, 180px)", anim: "drift-right", duration: 64, delay: -25, opacity: 0.44 },
-  { src: "/images/levon%20james.jpg", top: "52%", left: "90%", size: "clamp(100px, 12vw, 180px)", anim: "drift-left", duration: 66, delay: -12, opacity: 0.45 },
-  { src: "/images/damn.jpg", top: "75%", left: "3%", size: "clamp(100px, 12vw, 180px)", anim: "drift-up", duration: 58, delay: -30, opacity: 0.46 },
-  { src: "/images/one%20of%20wun.jpg", top: "78%", left: "20%", size: "clamp(70px, 9vw, 130px)", anim: "drift-diagonal-a", duration: 72, delay: -18, opacity: 0.42 },
-  { src: "/images/iamiwas.jpg", top: "76%", left: "78%", size: "clamp(100px, 12vw, 180px)", anim: "drift-down", duration: 62, delay: -22, opacity: 0.44 },
-  { src: "/images/jesus%20is%20king.jpg", top: "80%", left: "92%", size: "clamp(70px, 9vw, 130px)", anim: "drift-left", duration: 60, delay: -28, opacity: 0.45 },
-  { src: "/images/the%20college%20dropout.jpg", top: "18%", left: "5%", size: "clamp(70px, 9vw, 130px)", anim: "float-arc", duration: 75, delay: -14, opacity: 0.43 },
-  { src: "/images/nas.jpg", top: "35%", left: "85%", size: "clamp(70px, 9vw, 130px)", anim: "drift-right", duration: 66, delay: -6, opacity: 0.44 },
-  { src: "/images/grandson.jpg", top: "65%", left: "8%", size: "clamp(70px, 9vw, 130px)", anim: "drift-up", duration: 70, delay: -24, opacity: 0.42 },
-  { src: "/images/watch%20the%20throne.jpg", top: "70%", left: "82%", size: "clamp(70px, 9vw, 130px)", anim: "float-arc", duration: 68, delay: -16, opacity: 0.46 },
-  { src: "/images/issa.jpg", top: "42%", left: "2%", size: "clamp(80px, 10vw, 150px)", anim: "drift-down", duration: 63, delay: -11, opacity: 0.43 },
-  { src: "/images/maad%20city.jpg", top: "38%", left: "92%", size: "clamp(80px, 10vw, 150px)", anim: "drift-up", duration: 67, delay: -19, opacity: 0.44 },
-  { src: "/images/yeezus.jpg", top: "22%", left: "75%", size: "clamp(80px, 10vw, 150px)", anim: "drift-diagonal-b", duration: 69, delay: -7, opacity: 0.45 },
-  { src: "/images/life%20of%20pablo.jpg", top: "88%", left: "65%", size: "clamp(80px, 10vw, 150px)", anim: "drift-left", duration: 61, delay: -26, opacity: 0.44 },
+const FLOATING_ART_IMAGES = [
+  "/images/mbdtf.jpg",
+  "/images/tpab.jpg",
+  "/images/astroworld.jpg",
+  "/images/graduation.jpg",
+  "/images/808s%20and%20heartbreak.jpg",
+  "/images/late%20registration.jpg",
+  "/images/ye.jpg",
+  "/images/levon%20james.jpg",
+  "/images/damn.jpg",
+  "/images/one%20of%20wun.jpg",
+  "/images/iamiwas.jpg",
+  "/images/jesus%20is%20king.jpg",
+  "/images/the%20college%20dropout.jpg",
+  "/images/nas.jpg",
+  "/images/grandson.jpg",
+  "/images/watch%20the%20throne.jpg",
+  "/images/issa.jpg",
+  "/images/maad%20city.jpg",
+  "/images/yeezus.jpg",
+  "/images/life%20of%20pablo.jpg",
 ];
 
 function Home() {
@@ -33,6 +33,7 @@ function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [stems, setStems] = useState([]);
   const [statusMessage, setStatusMessage] = useState("");
+  const { covers, setRef } = useFloatingCovers(FLOATING_ART_IMAGES);
 
   return (
     <main
@@ -51,21 +52,20 @@ function Home() {
       <div className="stem-splitter-bg" aria-hidden="true" />
 
       <div className="stem-splitter-bg-art" aria-hidden="true">
-        {FLOATING_ART_CONFIG.map((item, i) => (
+        {covers.map((cover, i) => (
           <div
-            key={item.src + i}
-            className={`floating-art-img-wrap floating-art-img-wrap--${item.anim}`}
+            key={cover.id}
+            ref={(el) => setRef(i, el)}
+            className="floating-art-img-wrap floating-art-img-wrap--flow"
             style={{
-              top: item.top,
-              left: item.left,
-              width: item.size,
-              height: item.size,
-              opacity: item.opacity,
-              animationDuration: `${item.duration}s`,
-              animationDelay: `${item.delay}s`,
+              left: cover.x,
+              top: cover.y,
+              width: cover.size,
+              height: cover.size,
+              opacity: cover.opacity,
             }}
           >
-            <img src={item.src} alt="" className="floating-art-img" />
+            <img src={cover.src} alt="" className="floating-art-img" />
           </div>
         ))}
       </div>

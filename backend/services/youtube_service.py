@@ -37,6 +37,7 @@ USER_MESSAGES: Dict[str, str] = {
     "age_or_login_required": "This video requires a signed-in YouTube session.",
     "private_or_unavailable": "This video is private or unavailable.",
     "po_token_missing_or_attestation": "This video currently requires additional YouTube attestation/session data.",
+    "cookie_extraction_failed": "Browser cookie access failed for the configured browser.",
     "unknown": "Failed to download audio from YouTube.",
 }
 
@@ -95,6 +96,13 @@ def _classify_yt_dlp_error(stdout: str, stderr: str) -> str:
     if "po token" in lower or "sabr" in lower:
         return "po_token_missing_or_attestation"
 
+    # Cookie extraction / browser access failure (e.g. macOS Safari permissions)
+    if "cookie" in lower and (
+        "unable to extract" in lower or "could not find" in lower
+        or "failed" in lower or "error" in lower or "permission" in lower
+    ):
+        return "cookie_extraction_failed"
+
     return "unknown"
 
 
@@ -135,23 +143,34 @@ def _run_single_attempt(
 
 def _build_strategies(cookies_browser: Optional[str]) -> List[Dict[str, Any]]:
     """
-    Build strategy list in order: A default, B default+cookies, C web_safari,
-    D web_safari+cookies, E web_embedded, F web_embedded+cookies.
+    Build strategy list in order: a) default, b) default+cookies, c) web_safari,
+    d) web_safari+cookies, e) web_embedded, f) web_embedded+cookies.
     Cookie-based strategies are only included when cookies_browser is set.
+    log_name includes the browser for cookie attempts, e.g. default+cookies(chrome).
     """
     cookie_args = (
         ["--cookies-from-browser", cookies_browser]
         if cookies_browser
         else []
     )
+    def log_name(base: str) -> str:
+        if cookies_browser and "cookies" in base:
+            return f"{base}({cookies_browser})"
+        return base
+
     strategies: List[Dict[str, Any]] = [
-        {"name": "default", "extra_args": []},
+        {"name": "default", "log_name": "default", "extra_args": []},
     ]
     if cookies_browser:
-        strategies.append({"name": "default+cookies", "extra_args": cookie_args.copy()})
+        strategies.append({
+            "name": "default+cookies",
+            "log_name": log_name("default+cookies"),
+            "extra_args": cookie_args.copy(),
+        })
     strategies.extend([
         {
             "name": "web_safari",
+            "log_name": "web_safari",
             "extra_args": [
                 "--extractor-args",
                 "youtube:player_client=web_safari",
@@ -161,6 +180,7 @@ def _build_strategies(cookies_browser: Optional[str]) -> List[Dict[str, Any]]:
     if cookies_browser:
         strategies.append({
             "name": "web_safari+cookies",
+            "log_name": log_name("web_safari+cookies"),
             "extra_args": [
                 "--extractor-args",
                 "youtube:player_client=web_safari",
@@ -171,6 +191,7 @@ def _build_strategies(cookies_browser: Optional[str]) -> List[Dict[str, Any]]:
     # web_embedded often fails for videos with embedding disabled (e.g. Error 152 - 18).
     strategies.append({
         "name": "web_embedded",
+        "log_name": "web_embedded",
         "extra_args": [
             "--extractor-args",
             "youtube:player_client=web_embedded",
@@ -179,6 +200,7 @@ def _build_strategies(cookies_browser: Optional[str]) -> List[Dict[str, Any]]:
     if cookies_browser:
         strategies.append({
             "name": "web_embedded+cookies",
+            "log_name": log_name("web_embedded+cookies"),
             "extra_args": [
                 "--extractor-args",
                 "youtube:player_client=web_embedded",
@@ -206,9 +228,12 @@ def _run_yt_dlp_with_strategies(url: str, output_path: Path) -> int:
 
     for strategy in strategies:
         name = strategy["name"]
+        log_name = strategy.get("log_name", name)
         cmd_preview = "yt-dlp ... " + " ".join(strategy["extra_args"]) + " -o <path> " + url.strip()[:50] + "..."
         if debug_enabled:
-            logger.info("[yt] attempt=%s cmd=%s", name, cmd_preview)
+            logger.info("[yt] attempt=%s cmd=%s", log_name, cmd_preview)
+        else:
+            logger.info("[yt] attempt=%s", log_name)
 
         try:
             rc, stdout, stderr = _run_single_attempt(
@@ -235,6 +260,7 @@ def _run_yt_dlp_with_strategies(url: str, output_path: Path) -> int:
 
         attempts.append({
             "strategy": name,
+            "log_name": log_name,
             "returncode": rc,
             "category": category,
             "stderr_tail": stderr_tail,
@@ -243,17 +269,17 @@ def _run_yt_dlp_with_strategies(url: str, output_path: Path) -> int:
         if debug_enabled:
             logger.info(
                 "[yt] attempt=%s rc=%s stdout=%s stderr=%s",
-                name, rc, stdout, stderr,
+                log_name, rc, stdout, stderr,
             )
         else:
             logger.info(
                 "[yt] attempt=%s rc=%s classification=%s stderr_tail=%s",
-                name, rc, category or "ok", stderr_tail,
+                log_name, rc, category or "ok", stderr_tail,
             )
 
         if rc == 0 and output_path.exists():
             size_bytes = output_path.stat().st_size
-            logger.info("[yt] attempt=%s succeeded size_bytes=%s", name, size_bytes)
+            logger.info("[yt] attempt=%s succeeded size_bytes=%s", log_name, size_bytes)
             return size_bytes
 
     # All failed: use last non-None category for user message
@@ -265,9 +291,13 @@ def _run_yt_dlp_with_strategies(url: str, output_path: Path) -> int:
 
     user_message = _get_user_message(last_category)
     debug_summary = " | ".join(
-        f"{a['strategy']}: rc={a['returncode']}, cat={a.get('category') or 'n/a'}"
+        f"{a.get('log_name', a['strategy'])}: rc={a['returncode']}, cat={a.get('category') or 'n/a'}"
         for a in attempts
     )
+    if cookies_browser:
+        debug_summary += " | cookies_attempted=true"
+    else:
+        debug_summary += " | cookies_attempted=false"
 
     logger.error(
         "[yt] all attempts failed url=%s category=%s attempts=%s",

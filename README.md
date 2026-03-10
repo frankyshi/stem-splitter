@@ -27,6 +27,31 @@ separate stems (vocals, drums, bass, other) for preview and download.
 
 ---
 
+## Architecture
+
+Below is the high-level architecture of Stemsmith.
+
+![Stemsmith Architecture](docs/arch.svg)
+
+---
+
+### System Overview
+
+Stemsmith is a full-stack music processing application that converts media into usable audio stems.
+
+Workflow:
+
+1. Users upload an MP3, MP4/MOV file, or a YouTube URL through the React frontend.
+2. The frontend sends the request to a FastAPI backend.
+3. The backend orchestrates media processing using:
+   - yt-dlp (download YouTube audio)
+   - FFmpeg (media conversion)
+   - Demucs (AI-based stem separation)
+4. Processed files are temporarily stored and returned to the client.
+5. The frontend provides audio playback and download controls for the generated files.
+
+---
+
 ## Backend (FastAPI)
 
 ### Install dependencies

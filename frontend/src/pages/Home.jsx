@@ -95,6 +95,7 @@ function Home() {
           style={{
             marginBottom: "3rem",
             textAlign: "center",
+            paddingTop: "2.25rem",
             paddingBottom: "2rem",
             borderBottom: "1px solid rgba(148, 163, 184, 0.22)"
           }}
@@ -102,12 +103,10 @@ function Home() {
           <h1
             style={{
               fontFamily: "\"CollegiateBlackFLF\", var(--font-heading)",
-              fontSize: "clamp(2.2rem, 4.8vw, 3.5rem)",
               fontWeight: 700,
-              letterSpacing: "0.16em",
               margin: "0 0 0.9rem",
               textTransform: "uppercase",
-              lineHeight: 1.2,
+              lineHeight: 1.25,
               backgroundImage:
                 "linear-gradient(135deg, #e5e7eb 0%, #c4b5fd 32%, #a855f7 68%, #22d3ee 100%)",
               WebkitBackgroundClip: "text",
@@ -119,33 +118,32 @@ function Home() {
             <span
               style={{
                 display: "block",
-                fontSize: "clamp(2.3rem, 5.2vw, 3.6rem)",
+                fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
                 letterSpacing: "0.2em",
-                marginBottom: "0.08rem"
+                marginBottom: "0.4rem"
               }}
             >
-              Stem Splitter
+              STEM SPLITTER
             </span>
             <span
               style={{
                 display: "block",
-                fontSize: "clamp(0.85rem, 1.8vw, 1.05rem)",
+                fontSize: "clamp(1.15rem, 2.4vw, 1.45rem)",
                 letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                opacity: 0.7,
-                marginBottom: "0.08rem"
+                opacity: 0.92,
+                marginBottom: "0.4rem"
               }}
             >
-              For the
+              FOR THE
             </span>
             <span
               style={{
                 display: "block",
-                fontSize: "clamp(1.9rem, 4.2vw, 3rem)",
-                letterSpacing: "0.16em"
+                fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
+                letterSpacing: "0.2em"
               }}
             >
-              Sampling Enthusiast
+              SAMPLING ENTHUSIAST
             </span>
           </h1>
           <p

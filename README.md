@@ -174,13 +174,16 @@ embedding or session errors.
    # or: brew upgrade yt-dlp
    ```
 
-3. **Browser-cookie fallback** – For many public videos, the backend needs cookies.
-   Set the env var (no hardcoded browser name; use the browser you’re signed into):
+3. **Chrome cookie fallback** – For many YouTube videos (403, reload, or 152-18),
+   the backend may need browser cookies. **Chrome cookie fallback is often required.**
+   To enable it, set:
    ```bash
-   export YTDLP_COOKIES_FROM_BROWSER=chrome   # or firefox, safari, etc.
+   YTDLP_COOKIES_FROM_BROWSER=chrome
    ```
-   The app will try default and alternate clients first, then use
-   `--cookies-from-browser <value>` when configured.
+   (Copy from `.env.example` or export in your shell.) The app will then try
+   default, then default+Chrome cookies, then web_safari, web_safari+cookies,
+   web_embedded, web_embedded+cookies. Safari cookie extraction may fail on macOS
+   due to permissions; use Chrome (or Firefox) if that happens.
 
 4. **Manual test** – To see exactly how yt-dlp behaves for a URL:
    ```bash

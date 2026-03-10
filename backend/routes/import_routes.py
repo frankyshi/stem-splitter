@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from ..paths import UPLOADS_DIR
-from ..services.youtube_service import import_youtube_to_uploads
+from ..services.youtube_service import import_youtube_to_uploads, diagnose_youtube_url
 from ..services.mp4_service import import_mp4_to_uploads as convert_mp4_to_uploads
 
 logger = logging.getLogger(__name__)
@@ -34,6 +34,22 @@ async def import_youtube(request: YouTubeImportRequest):
     result["filename"] = result.get("stored_filename") or result.get("original_filename") or "audio.mp3"
     result["status"] = "ready"
     logger.info("YouTube import success: file_id=%s filename=%s", result["file_id"], result["filename"])
+    return JSONResponse(result)
+
+
+@router.get("/import/youtube/diagnose")
+async def youtube_import_diagnose(url: str = ""):
+    """
+    Local debugging only: run the same YouTube download strategies without persisting
+    a file. Returns which attempts were tried, how each failed, and final classification.
+    Query param: url (YouTube watch/shorts URL).
+    """
+    if not url.strip():
+        return JSONResponse(
+            status_code=400,
+            content={"error": "missing_url", "message": "Query param 'url' is required."},
+        )
+    result = diagnose_youtube_url(url.strip())
     return JSONResponse(result)
 
 

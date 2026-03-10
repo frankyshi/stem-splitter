@@ -1,4 +1,4 @@
-#!/Users/ShiFr/programming/personal/stem-splitter/backend/.venv/bin/python
+#!/Users/ShiFr/programming/personal/stem-splitter/backend/.venv/bin/python3.11
 import sys
 from watchfiles.cli import cli
 if __name__ == '__main__':

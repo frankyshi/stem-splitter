@@ -66,6 +66,9 @@ Workflow:
 
 ## Backend (FastAPI)
 
+**Requirements:** Python 3.10+ is recommended (and required for current yt-dlp support).
+The backend does not pin 3.9; use 3.10 or newer for the virtualenv.
+
 ### Install dependencies
 
 From the project root:
@@ -94,6 +97,7 @@ at `http://localhost:8000/docs`.
 - `GET /api/stems/{file_id}` – list available stems for a given `file_id`
 - `GET /api/download/{file_id}` – download a stem WAV by name (query param `stem`)
 - `POST /api/import/youtube` – import YouTube audio to MP3 (yt-dlp + FFmpeg)
+- `GET /api/import/youtube/diagnose?url=...` – local debugging: dry-run YouTube strategies, no file saved
 - `POST /api/import/mp4` – convert uploaded video to MP3 (FFmpeg)
 - `GET /api/download-original/{file_id}` – download the original uploaded/imported MP3
 
@@ -136,3 +140,57 @@ At a high level:
 - The backend locates the uploaded/imported MP3 in `uploads/`
 - It runs Demucs (htdemucs) to generate the 4 standard stems
 - It writes stem WAV files to `stems/{file_id}/` and exposes them via download/list endpoints
+
+---
+
+## Troubleshooting
+
+### YouTube import: common failures
+
+YouTube often requires **cookies and/or attestation (PO Token / SABR)** for some videos.
+Forcing a single client (e.g. `web_embedded`) is **not a universal fix**: some videos
+work with the default client, others need browser cookies, and others fail with
+embedding or session errors.
+
+**Failure modes (different causes):**
+
+- **403 Forbidden** – YouTube blocked the download request (IP/client/rate limits).
+- **Error 152 - 18 / “Watch video on YouTube”** – Video cannot be played in the
+  embedded player; try another public video or use browser-cookie fallback.
+- **“The page needs to be reloaded”** – Playback session rejected; cookies or
+  updated yt-dlp often help.
+- **Age / login required** – Video needs a signed-in YouTube session (cookies help).
+- **PO Token / SABR** – YouTube is using attestation; newer yt-dlp and/or cookies
+  may be required.
+
+**Recommended setup:**
+
+1. **Python 3.10+** – The project and yt-dlp recommend Python 3.10 or newer.
+   Python 3.9 is deprecated for yt-dlp and some fixes require 3.10+.
+
+2. **Update yt-dlp regularly** – YouTube changes often; use a recent or nightly build:
+   ```bash
+   pip install -U yt-dlp
+   # or: brew upgrade yt-dlp
+   ```
+
+3. **Browser-cookie fallback** – For many public videos, the backend needs cookies.
+   Set the env var (no hardcoded browser name; use the browser you’re signed into):
+   ```bash
+   export YTDLP_COOKIES_FROM_BROWSER=chrome   # or firefox, safari, etc.
+   ```
+   The app will try default and alternate clients first, then use
+   `--cookies-from-browser <value>` when configured.
+
+4. **Manual test** – To see exactly how yt-dlp behaves for a URL:
+   ```bash
+   yt-dlp -vU "https://www.youtube.com/watch?v=..."
+   yt-dlp -vU --cookies-from-browser chrome "https://www.youtube.com/watch?v=..."
+   ```
+
+5. **Local diagnostic** – Call the backend diagnostic endpoint (no file is saved):
+   ```text
+   GET /api/import/youtube/diagnose?url=https://www.youtube.com/watch?v=...
+   ```
+   Response includes which strategies were tried, exit codes, classifications,
+   and the user message that would be shown on full import failure.

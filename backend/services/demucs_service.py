@@ -72,15 +72,19 @@ def split_to_stems(input_path: Path, output_dir: Path) -> List[Dict[str, str]]:
             ),
         )
 
-    if completed.returncode != 0:
+    returncode = completed.returncode
+    logger.info("Demucs process finished returncode=%s", returncode)
+
+    # Success is determined only by return code and presence of stem files, not stderr.
+    # TorchCodec/torchaudio warnings on stderr are ignored when returncode is 0.
+    if returncode != 0:
         logger.error(
             "Demucs process failed with code %s\nstdout:\n%s\nstderr:\n%s",
-            completed.returncode,
+            returncode,
             completed.stdout,
             completed.stderr,
         )
         shutil.rmtree(temp_root, ignore_errors=True)
-
         raise HTTPException(
             status_code=500,
             detail=(
@@ -89,29 +93,66 @@ def split_to_stems(input_path: Path, output_dir: Path) -> List[Dict[str, str]]:
             ),
         )
 
+    if returncode == 0:
+        logger.info(
+            "Demucs exited 0 (stderr warnings e.g. TorchCodec are ignored for success)"
+        )
+
     try:
         model_root = temp_root / "htdemucs"
-        if not model_root.exists():
-            raise RuntimeError(f"Demucs output directory not found at {model_root}")
+        logger.info("Resolved Demucs output base: %s", model_root)
 
-        # Detect whether stems are directly under model_root
+        if not model_root.exists():
+            logger.error(
+                "Demucs completed but output directory missing: checked %s",
+                model_root,
+            )
+            shutil.rmtree(temp_root, ignore_errors=True)
+            raise HTTPException(
+                status_code=500,
+                detail="Demucs completed, but no output stem files were found.",
+            )
+
+        # Demucs writes either htdemucs/<track_name>/{vocals,drums,bass,other}.wav
+        # or (older/some configs) stems directly under htdemucs/
         if (model_root / "vocals.wav").exists():
             track_dir = model_root
         else:
             track_dirs = [p for p in model_root.iterdir() if p.is_dir()]
             if not track_dirs:
-                raise RuntimeError(f"No track output found under {model_root}")
+                logger.error(
+                    "Demucs completed but no track subdir under %s; contents: %s",
+                    model_root,
+                    list(model_root.iterdir()) if model_root.exists() else "n/a",
+                )
+                shutil.rmtree(temp_root, ignore_errors=True)
+                raise HTTPException(
+                    status_code=500,
+                    detail="Demucs completed, but no output stem files were found.",
+                )
             track_dir = track_dirs[0]
 
-        track_dir = track_dirs[0]
-        logger.info("Using Demucs track output directory %s", track_dir)
+        logger.info("Demucs track directory: %s", track_dir)
+
+        # Log which stem files we found before moving
+        found = [track_dir / f"{s}.wav" for s in SUPPORTED_STEMS if (track_dir / f"{s}.wav").exists()]
+        missing = [f"{s}.wav" for s in SUPPORTED_STEMS if not (track_dir / f"{s}.wav").exists()]
+        logger.info("Discovered stem files in %s: %s", track_dir, [p.name for p in found])
+        if missing:
+            logger.error(
+                "Demucs completed but stem files missing in %s: %s",
+                track_dir,
+                missing,
+            )
+            shutil.rmtree(temp_root, ignore_errors=True)
+            raise HTTPException(
+                status_code=500,
+                detail="Demucs completed, but no output stem files were found.",
+            )
 
         stems: List[Dict[str, str]] = []
         for stem_name in SUPPORTED_STEMS:
             source = track_dir / f"{stem_name}.wav"
-            if not source.exists():
-                raise RuntimeError(f"Expected stem file not found: {source}")
-
             target = output_dir / f"{stem_name}.wav"
             shutil.move(str(source), str(target))
             stems.append(
@@ -121,8 +162,11 @@ def split_to_stems(input_path: Path, output_dir: Path) -> List[Dict[str, str]]:
                 }
             )
 
+        logger.info("Stems moved to app output dir: %s", output_dir)
         return stems
 
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.exception("Error while processing Demucs output: %s", exc)
         raise HTTPException(

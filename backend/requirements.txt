@@ -4,4 +4,4 @@ python-multipart>=0.0.7
 pydantic>=2.9.0
 demucs
 soundfile
-yt-dlp>=2024.1.0
+yt-dlp>=2024.12.0

@@ -111,7 +111,7 @@ function Home() {
               textShadow: "0 0 52px var(--color-accent-subtle)"
             }}
           >
-            Built for the underdog producer
+            STEM SPLITTER FOR SAMPLING SPECIALISTS
           </h1>
           <p
             style={{
@@ -125,7 +125,7 @@ function Home() {
               marginRight: "auto"
             }}
           >
-            Convert any source to MP3, then split it into stems—vocals, drums, bass, and more. Built for isolating vocals, flipping samples, building drum kits, and turning rough ideas into records.
+            Convert any source to MP3, then split it into its stems - vocals, drums, bass, and more. Built for isolating vocals, flipping samples, building drum kits, and turning rough ideas into records!
           </p>
         </header>
 
